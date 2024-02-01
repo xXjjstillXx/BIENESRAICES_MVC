@@ -1,10 +1,14 @@
 import express from 'express';
-import { formularioLogin, formularioSignin,formularioOlvideContrasena } from '../controllers/UsuarioController.js';
+import { formularioLogin, formularioSignin,formularioOlvideContrasena,registrar } from '../controllers/UsuarioController.js';
 
 const router = express.Router();
 
 router.get('/login',formularioLogin);
+
 router.get('/signin',formularioSignin);
+
+router.post('/signin',registrar);
+
 router.get('/recovery',formularioOlvideContrasena);
 
 
