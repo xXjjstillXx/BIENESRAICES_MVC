@@ -1,5 +1,6 @@
 import { check, validationResult } from 'express-validator';
-
+import {generarId } from '../helpers/tokens.js';
+import {emailRegistro} from '../helpers/emails.js';
 import Usuario from '../models/Usuario.js';
 
 const formularioLogin = (req, res) => {
@@ -52,12 +53,43 @@ const registrar = async (req, res) => {
     }
 
     //almacenar un usuario
-    await Usuario.create({
+    const usuario = await Usuario.create({
         nombre,
         email,
         password,
-        token: 123
+        token: generarId()
     })
+
+    //Envia email de verificacion
+    emailRegistro({
+        nombre: usuario.nombre,
+        email: usuario.email,
+        token: usuario.token
+    })
+
+    //Mostrar mensaje de confirmacion
+    res.render('templates/mensaje', {
+        pagina: 'Cuenta creada exitosamente.',
+        mensaje: 'Hemos enviado un correo de confirmacion, por favor revisa tu correo.'
+    })
+}
+
+//Funcion para confirmar cuenta
+
+const confirmar = async (req,res)=>{
+    const{token}=req.params;
+    //verificar que el token es valido
+
+    const usuario = await Usuario.findOne({where: {token}});
+    if(!usuario){
+        return res.render('auth/confirmarCuenta',{
+            pagina: 'Error al confirmar cuenta',
+            mensaje: 'Hubo un error inesperado al confirmar tu cuenta, intenta de nuevo',
+            error: true
+        })
+    }
+    //confirmar la cuenta 
+
 }
 
 const formularioOlvideContrasena = (req, res) => {
@@ -68,6 +100,7 @@ const formularioOlvideContrasena = (req, res) => {
 export{
     formularioLogin,
     formularioSignin,
-    formularioOlvideContrasena,
-    registrar
+    registrar,
+    confirmar,
+    formularioOlvideContrasena
 }

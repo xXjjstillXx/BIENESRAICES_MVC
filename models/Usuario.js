@@ -22,8 +22,6 @@ const Usuario = db.define('usuarios', {
     hooks:{
         beforeCreate: async function(usuario){
             const salt = await bcrypt.genSalt(10);
-            console.log('Usuario antes del hash:', usuario);
-            console.log('Salt:', salt);
             usuario.password = await bcrypt.hash(usuario.password, salt);
         }
     }
