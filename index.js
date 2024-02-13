@@ -3,6 +3,8 @@
 
 //Forma nueva de importar paquetes
 import express from 'express';
+import csrf from 'csurf';
+import cookieParser from 'cookie-parser';
 import usuarioRoutes from './routes/usuarioRoutes.js';
 import db from './config/db.js';
 
@@ -10,23 +12,29 @@ import db from './config/db.js';
 const app = express();
 
 //habilitar lectura de datos de formularios 
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({extended: true}));
+
+//habilitar coockie-parser 
+app.use(cookieParser());
+
+//habilitar CSRF
+app.use( csrf({cookie: true}) )
 
 //conexion a la base de datos 
 try{
     await db.authenticate();
     db.sync();
-    console.log('Conexion establecida a la base de datos')
+    console.log('Conexion establecida a la base de datos');
 }catch(error){
-    console.log(error)
+    console.log(error);
 }
 
 //habilitar pug
-app.set('view engine','pug')
-app.set('views','./views')
+app.set('view engine','pug');
+app.set('views','./views');
 
 //Carpeta publica
-app.use(express.static('public'))
+app.use(express.static('public'));
 
 //Routing
 // app.get('/', usuarioRoutes); este comando se limita a una ruta exacta, en este caso solo a la '/'

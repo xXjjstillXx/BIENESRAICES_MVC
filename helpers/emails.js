@@ -28,6 +28,35 @@ const emailRegistro = async(datos) =>{
     })
 }
 
+const emailRecovery = async(datos) =>{
+    const transport = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+    const{ email, nombre, token} = datos;
+
+    //enviar el email
+    await transport.sendMail({
+        from: 'BienesRaices.com',
+        to: email,
+        subject: 'Cambio de contraseña en BienesRaices.com',
+        text:'Cambio de contraseña en BienesRaices.com',
+        html:`
+            <p>Hola ${nombre}, parece que has solicitado un cambio de contraseña en BienesRaices </p>
+
+            <p> Puedes cambiar tu contraseña dando click en el siguiente enlace: 
+            <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/recovery/${token}">Cambiar contraseña</a> </p>
+
+            <p>Si tu no solicitaste el cambio de contrasña, puedes ignorar el mensaje</p>
+        `
+    })
+}
 export {
-    emailRegistro
+    emailRegistro,
+    emailRecovery,
+    
 }

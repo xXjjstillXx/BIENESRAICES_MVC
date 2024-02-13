@@ -1,5 +1,6 @@
 import express from 'express';
-import { formularioLogin, formularioSignin,registrar, confirmar, formularioOlvideContrasena,} from '../controllers/UsuarioController.js';
+import { formularioLogin,formularioSignin, registrar, confirmar,
+    formularioOlvideContrasena, resetPassword, comprobarToken, nuevoPassword} from '../controllers/UsuarioController.js';
 
 const router = express.Router();
 
@@ -12,11 +13,12 @@ router.get('/confirm/:token',confirmar);
 
 
 router.get('/recovery',formularioOlvideContrasena);
+router.post('/recovery',resetPassword);
 
+//Almacenar nuevo password
+router.get('/recovery/:token', comprobarToken);
+router.post('/recovery/:token', nuevoPassword);
 
-router.post('/', function(req,res){
-    res.json({msg: 'Respuesta tipo post'});
-})
 
 
 
