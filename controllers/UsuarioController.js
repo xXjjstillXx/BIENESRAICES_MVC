@@ -11,6 +11,57 @@ const formularioLogin = (req, res) => {
     });
 }
 
+const autenticar = async(req,res) => {
+    //validacion
+    await check('email').isEmail().withMessage('Email inválido').run(req);
+    await check('password').notEmpty().withMessage('Contraseña inválida').run(req);
+
+    let resultado = validationResult(req);
+    //verificar que el resultado este vacio
+    if(!resultado.isEmpty()){
+        return res.render('auth/login', {
+            pagina: 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: resultado.array(),
+        })
+    }
+
+    const {email,password} = req.body;
+    //Comprobar si el usuario existe
+    const usuario = await Usuario.findOne({where:{email}})
+    if(!usuario){
+        return res.render('auth/login', {
+            pagina: 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{msg: 'Parece que tu correo no está registrado'}],
+        })
+    }
+
+    //Comprobar si el usuario está confirmado
+    if(!usuario.confirmado){
+        return res.render('auth/login', {
+            pagina: 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{msg: 'Tu cuenta no ha sido confirmada, por favor revisa tu correo'}],
+        })
+    }
+
+    //Comprobar contraseña
+    if(!usuario.verificarPassword(password)){
+        return res.render('auth/login', {
+            pagina: 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{msg: 'Contraseña inválida'}],
+            usuario: {
+                email: email
+            }
+        })
+    }
+
+    //Autenticar al usuario
+    
+}
+
 const formularioSignin = (req, res) => {
     res.render('auth/signin', {
         pagina: 'Crear cuenta',
@@ -216,6 +267,7 @@ const nuevoPassword = async (req,res) => {
 }
 export{
     formularioLogin,
+    autenticar,
     formularioSignin,
     registrar,
     confirmar,

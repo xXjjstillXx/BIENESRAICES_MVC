@@ -58,5 +58,4 @@ const emailRecovery = async(datos) =>{
 export {
     emailRegistro,
     emailRecovery,
-    
 }
